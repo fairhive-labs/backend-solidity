@@ -19,5 +19,11 @@ contract("POLNToken", (accounts) => {
         assert(symbol === "POLN", `incorrect symbol, got ${symbol}, want "POLN"`);
     });
 
-    //@TODO : control initialSupply and balance
+    it("has expected initial supply", async () => {
+        const contract = await POLNToken.deployed();
+        const supply = await contract.totalSupply();
+        assert("200000000000000000000000000" === supply.toString(), `incorrect supply, got ${supply.toString()}, want "200000000000000000000000000"`);
+    });
+
+    //@TODO : balance
 });
