@@ -7,6 +7,13 @@ contract("POLNToken", (accounts) => {
         assert(contract.address, "contract has no address or empty address");
     });
 
+    it("has expected decimals", async () => {
+        const contract = await POLNToken.deployed();
+        const d = await contract.decimals();
+        const decimals = web3.utils.toBN(d);
+        assert(web3.utils.toBN(18).eq(decimals));
+    });
+
     it("has expected name", async () => {
         const contract = await POLNToken.deployed();
         const name = await contract.name();
@@ -35,10 +42,15 @@ contract("POLNToken", (accounts) => {
         assert(supply.toString() === balance.toString(), `incorrect balance, got ${balance.toString()}, want ${supply.toString()}`);
     });
 
-    xit("should transfer", async () => {
-        const contract = await POLNToken.deployed();
+    it("should transfer", async () => {
+        const contract = await POLNToken.new();
         const a0b1 = web3.utils.toBN(await contract.balanceOf(accounts[0]));
         const a1b1 = web3.utils.toBN(await contract.balanceOf(accounts[1]));
         assert(a1b1.isZero());
+        const amount = 1000;
+        await contract.transfer(accounts[1], amount);
+        const a1b2 = web3.utils.toBN(await contract.balanceOf(accounts[1]));
+        assert(!a1b2.isZero());
+        assert(web3.utils.toBN(amount).eq(a1b2));
     });
 });
