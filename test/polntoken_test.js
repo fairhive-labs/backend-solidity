@@ -75,9 +75,23 @@ contract("POLNToken", (accounts) => {
 
     it("should check default allowance", async () => {
         const contract = await POLNToken.deployed();
-        const acc0acc2Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[2]));
+        const acc0acc1Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[1]));
+        assert(acc0acc1Allowance);
+        assert(acc0acc1Allowance.isZero());
+    });
+
+    it("should approve", async () => {
+        const contract = await POLNToken.deployed();
+        let acc0acc2Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[2]));
         assert(acc0acc2Allowance);
         assert(acc0acc2Allowance.isZero());
+
+        const amount = web3.utils.toBN(1000);
+        assert(await contract.approve(accounts[2], amount.toNumber()));
+        acc0acc2Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[2]));
+        assert(acc0acc2Allowance);
+        assert(!acc0acc2Allowance.isZero());
+        assert(acc0acc2Allowance.eq(amount));
     });
     //@TODO : test allowance + transferFrom + increase/decreaseAllowance
 });
