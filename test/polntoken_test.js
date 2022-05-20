@@ -25,5 +25,10 @@ contract("POLNToken", (accounts) => {
         assert("200000000000000000000000000" === supply.toString(), `incorrect supply, got ${supply.toString()}, want "200000000000000000000000000"`);
     });
 
-    //@TODO : balance
+    it("has expected initial balance", async () => {
+        const contract = await POLNToken.deployed();
+        const supply = await contract.totalSupply();
+        const balance = await contract.balanceOf(accounts[0]);
+        assert(supply.toString() === balance.toString(), `incorrect balance, got ${balance.toString()}, want ${supply.toString()}`);
+    });
 });
