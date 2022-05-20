@@ -72,5 +72,12 @@ contract("POLNToken", (accounts) => {
         assert(!account1b2.isZero());
         assert(account1b2.eq(amount));
     });
+
+    it("should check default allowance", async () => {
+        const contract = await POLNToken.deployed();
+        const acc0acc2Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[2]));
+        assert(acc0acc2Allowance);
+        assert(acc0acc2Allowance.isZero());
+    });
     //@TODO : test allowance + transferFrom + increase/decreaseAllowance
 });
