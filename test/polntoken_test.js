@@ -23,6 +23,9 @@ contract("POLNToken", (accounts) => {
         const contract = await POLNToken.deployed();
         const supply = await contract.totalSupply();
         assert("200000000000000000000000000" === supply.toString(), `incorrect supply, got ${supply.toString()}, want "200000000000000000000000000"`);
+        const bn = web3.utils.toBN(supply);
+        assert(web3.utils.isBN(bn));
+        assert(web3.utils.toBN(web3.utils.toWei("200000000", "ether")).eq(bn));
     });
 
     it("has expected initial balance", async () => {
@@ -30,5 +33,12 @@ contract("POLNToken", (accounts) => {
         const supply = await contract.totalSupply();
         const balance = await contract.balanceOf(accounts[0]);
         assert(supply.toString() === balance.toString(), `incorrect balance, got ${balance.toString()}, want ${supply.toString()}`);
+    });
+
+    xit("should transfer", async () => {
+        const contract = await POLNToken.deployed();
+        const a0b1 = web3.utils.toBN(await contract.balanceOf(accounts[0]));
+        const a1b1 = web3.utils.toBN(await contract.balanceOf(accounts[1]));
+        assert(a1b1.isZero());
     });
 });
