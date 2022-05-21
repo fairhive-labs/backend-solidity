@@ -123,4 +123,34 @@ contract("POLNToken", (accounts) => {
         assert(acc0acc3Allowance);
         assert(acc0acc3Allowance.eq(amount.sub(payment)));
     });
+
+    it("should increase and decrease allowance", async () => {
+        const contract = await POLNToken.deployed();
+        const amount = web3.utils.toBN(2000);
+        assert(await contract.increaseAllowance(accounts[4], amount.toNumber()));
+
+        let acc0acc4Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[4]));
+        assert(acc0acc4Allowance);
+        assert(acc0acc4Allowance.eq(amount));
+
+        const value = web3.utils.toBN(1000);
+        assert(await contract.decreaseAllowance(accounts[4], value.toNumber()));
+
+        acc0acc4Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[4]));
+        assert(acc0acc4Allowance);
+        assert(acc0acc4Allowance.eq(amount.sub(value)));
+
+        assert(await contract.decreaseAllowance(accounts[4], value.toNumber()));
+
+        acc0acc4Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[4]));
+        assert(acc0acc4Allowance);
+        assert(acc0acc4Allowance.isZero());
+
+        try {
+            await contract.decreaseAllowance(accounts[4], value.toNumber());
+            assert(false);
+        } catch (err) {
+            assert(err.reason === "ERC20: decreased allowance below zero");
+        }
+    });
 });
