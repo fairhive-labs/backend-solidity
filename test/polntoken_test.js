@@ -3,6 +3,11 @@ const POLNToken = artifacts.require("POLNToken");
 contract("POLNToken", (accounts) => {
     const totalSupply = web3.utils.toBN(web3.utils.toWei("200000000", "ether"));
 
+    console.log("Accounts:")
+    for (i = 0; i < accounts.length; i++) {
+        console.log(`[${i}] ${accounts[i]}`);
+    }
+
     it("is deployed", async () => {
         const contract = await POLNToken.deployed();
         assert(contract, "contract is not deployed");
@@ -93,5 +98,29 @@ contract("POLNToken", (accounts) => {
         assert(!acc0acc2Allowance.isZero());
         assert(acc0acc2Allowance.eq(amount));
     });
-    //@TODO : test allowance + transferFrom + increase/decreaseAllowance
+
+    it("should increase allowance + transferFrom", async () => {
+        const contract = await POLNToken.deployed();
+        const amount = web3.utils.toBN(2000);
+        assert(await contract.increaseAllowance(accounts[3], amount.toNumber()));
+
+        let acc0acc3Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[3]));
+        assert(acc0acc3Allowance);
+        assert(acc0acc3Allowance.eq(amount));
+
+        let balanceAccount4 = web3.utils.toBN(await contract.balanceOf(accounts[4]));
+        assert(balanceAccount4);
+        assert(balanceAccount4.isZero());
+
+        const payment = web3.utils.toBN(1000);
+        assert(await contract.transferFrom(accounts[0], accounts[4], payment.toNumber(), { from: accounts[3] }));
+        balanceAccount4 = web3.utils.toBN(await contract.balanceOf(accounts[4]));
+        assert(balanceAccount4);
+        assert(!balanceAccount4.isZero());
+        assert(balanceAccount4.eq(payment));
+
+        acc0acc3Allowance = web3.utils.toBN(await contract.allowance(accounts[0], accounts[3]));
+        assert(acc0acc3Allowance);
+        assert(acc0acc3Allowance.eq(amount.sub(payment)));
+    });
 });
