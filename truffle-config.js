@@ -105,6 +105,18 @@ module.exports = {
       skipDryRun: true
     },
 
+    // avalanche mainnet
+    avalanche: {
+      provider: () => {
+        return new HDWalletProvider(
+          mnemonic,
+          `https://api.avax.network/ext/bc/C/rpc`);
+      },
+      network_id: 43114,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+
     bnbt: {
       provider: () => new HDWalletProvider(
         mnemonic,
