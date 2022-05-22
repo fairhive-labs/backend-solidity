@@ -12,6 +12,7 @@ contract("POLNToken", (accounts) => {
         const contract = await POLNToken.deployed();
         assert(contract, "contract is not deployed");
         assert(contract.address, "contract has no address or empty address");
+        console.log(`${contract.address}`);
     });
 
     it("has expected decimals", async () => {
