@@ -151,7 +151,10 @@ contract("POLNToken", (accounts) => {
             await contract.decreaseAllowance(accounts[4], value.toNumber());
             assert(false);
         } catch (err) {
-            assert(err.reason === "ERC20: decreased allowance below zero");
+            assert(err);
+            if (err.reason) {
+                assert(err.reason === "ERC20: decreased allowance below zero");
+            }
         }
     });
 });
