@@ -15,15 +15,20 @@ contract WaitList is Ownable {
         TALENT
     }
 
-    struct User {
+    struct PreregisteredUser {
         address user;
-        string email; // off-chain encryption
+        address sponsor;
+        string email; // off-chain encrypted
         string uuid;
-        uint256 timestamp;
+        uint timestamp;
         UserType utype;
     }
 
-    uint256 constant max = 10000;
-    uint256 private count = 0;
-    UserType[max] private users;
+    uint public constant max = 10000;
+    uint private _count = 0;
+    PreregisteredUser[max] private _preregisteredUsers;
+
+    function count() public view returns (uint){
+        return _count;
+    }
 }
