@@ -19,7 +19,7 @@ contract WaitList is Ownable {
         address user;
         address sponsor;
         string email; // off-chain encrypted
-        string uuid;
+        string uuid; // linked with off-chain workloads
         uint256 timestamp;
         UserType utype;
     }
