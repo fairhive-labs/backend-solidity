@@ -20,15 +20,42 @@ contract WaitList is Ownable {
         address sponsor;
         string email; // off-chain encrypted
         string uuid;
-        uint timestamp;
+        uint256 timestamp;
         UserType utype;
     }
 
-    uint public constant max = 10000;
-    uint private _count = 0;
-    PreregisteredUser[max] private _preregisteredUsers;
+    event PreregisteredUserAdded(
+        address indexed user,
+        UserType indexed utype,
+        uint256 indexed timestamp
+    );
 
-    function count() public view returns (uint){
+    uint256 private _count = 0;
+    uint256 public constant max = 10000;
+    mapping(address => PreregisteredUser) private _preregisteredUsers;
+    address[max] private _index;
+    mapping(address => uint256) private _sponsors;
+
+    function count() public view returns (uint256) {
         return _count;
+    }
+
+    function add(PreregisteredUser memory user) public {
+        PreregisteredUser memory _user = PreregisteredUser(
+            msg.sender,
+            user.sponsor,
+            user.email,
+            user.uuid,
+            block.timestamp,
+            user.utype
+        );
+
+        //@TODO : control user does not exist
+        _preregisteredUsers[msg.sender] = _user;
+        _index[_count] = msg.sender;
+        _count++;
+        _sponsors[user.sponsor]++;
+
+        emit PreregisteredUserAdded(msg.sender, _user.utype, block.timestamp);
     }
 }
