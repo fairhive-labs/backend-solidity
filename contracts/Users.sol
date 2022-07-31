@@ -15,7 +15,7 @@ struct User {
     address user;
     address sponsor;
     string email; // off-chain encrypted
-    string uuid; // linked with off-chain workloads
+    string uuid; // linked with off-chain tracking
     uint256 timestamp;
     UserType utype;
 }
@@ -31,8 +31,28 @@ contract Users {
         uint256 timestamp
     );
 
+    constructor() {
+        User memory firstUser = User(
+            msg.sender,
+            msg.sender,
+            "9a3ca5351679ea72cb2554284e4f11b7a29bf312ef63abdee4ca99635a056fad3db5f0eac25402b49eb620ecaf41326a1685",
+            "f9a5fb84-cdd2-46ed-aa27-44426f5e99c6",
+            1650123201,
+            UserType.MENTOR
+        );
+        _users[msg.sender] = firstUser;
+        _index.push(msg.sender);
+    }
+
     function count() public view returns (uint256) {
         return _index.length;
+    }
+
+    function exist(address user) private view returns (bool) {
+        return
+            _users[user].sponsor != address(0) &&
+            bytes(_users[user].uuid).length != 0 &&
+            _users[user].timestamp > 0;
     }
 
     function add(
@@ -41,6 +61,14 @@ contract Users {
         string memory uuid,
         UserType utype
     ) public {
+        require(exist(sponsor), "Sponsor's address required");
+        require(!exist(msg.sender), "Can't add an already used address");
+        require(
+            bytes(email).length != 0,
+            "Valid encrypted email address required"
+        );
+        require(bytes(uuid).length != 0, "Valid UUID required");
+
         User memory _user = User(
             msg.sender,
             sponsor,
@@ -50,7 +78,6 @@ contract Users {
             utype
         );
 
-        //@TODO : control user does not exist
         _users[msg.sender] = _user;
         _index.push(msg.sender);
         _sponsors[sponsor]++;
