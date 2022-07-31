@@ -32,7 +32,8 @@ contract Users {
     );
 
     constructor() {
-        User memory firstUser = User(
+        //first user
+        _users[msg.sender] = User(
             msg.sender,
             msg.sender,
             "9a3ca5351679ea72cb2554284e4f11b7a29bf312ef63abdee4ca99635a056fad3db5f0eac25402b49eb620ecaf41326a1685",
@@ -40,7 +41,7 @@ contract Users {
             1650123201,
             UserType.MENTOR
         );
-        _users[msg.sender] = firstUser;
+        
         _index.push(msg.sender);
     }
 
