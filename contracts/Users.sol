@@ -23,7 +23,7 @@ struct User {
 contract Users {
     mapping(address => User) private _users;
     address[] private _index;
-    mapping(address => uint256) private _sponsors;
+    mapping(address => address[]) private _sponsors;
 
     event UserAdded(
         address indexed user,
@@ -80,8 +80,16 @@ contract Users {
 
         _users[msg.sender] = _user;
         _index.push(msg.sender);
-        _sponsors[sponsor]++;
+        _sponsors[sponsor].push(msg.sender);
 
         emit UserAdded(msg.sender, _user.utype, block.timestamp);
+    }
+
+    function isSponsor(address sponsor) public view returns (bool) {
+        return sponsorCount(sponsor) != 0;
+    }
+
+    function sponsorCount(address sponsor) public view returns (uint256) {
+        return _sponsors[sponsor].length;
     }
 }
