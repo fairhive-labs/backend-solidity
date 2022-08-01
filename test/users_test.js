@@ -57,4 +57,21 @@ contract("Users", (accounts) => {
         assert(web3.utils.toBN(sponsorCount).isZero(), `sponsor count of ${accounts[2]} should be equal to 0 because ${accounts[2]} is not a sponsor`);
     });
 
+    it("should list users", async () => {
+        const contract = await Users.deployed();
+        // add multiple users 
+        for (let i = 0; i < 7; i++) {
+            await contract.add(sponsor, `h4sh3mail-${2 + i}`, `uuid-${2 + i}`, i % 7, { from: accounts[2 + i] });
+        }
+        const count = web3.utils.toBN(await contract.count());
+        const expectedCount = 9;
+        assert(web3.utils.toBN(expectedCount).eq(count), `count should be equal to ${expectedCount}`);
+
+        let limit = 10;
+        let offset = 0;
+        const users = await contract.users(offset,limit);
+        assert(users,"users should be defined");
+        assert(users.length == expectedCount, `users length should be ${expectedCount}`);
+    });
+
 });

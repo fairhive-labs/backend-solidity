@@ -95,21 +95,21 @@ contract Users {
         return _sponsors[sponsor].length;
     }
 
-    function users(uint256 limit, uint256 offset)
+    function users(uint256 offset, uint256 limit)
         public
         view
-        returns (User[] memory collection)
+        returns (User[] memory coll)
     {
         require(offset <= _index.length, "offset out of bounds");
         uint256 size = _index.length - offset;
         size = size < limit ? size : limit;
         size = size < maxLimit ? size : maxLimit;
 
-        collection = new User[](size);
+        coll = new User[](size);
         for (uint256 i = 0; i < size; i++) {
-            collection[i] = _users[_index[i]];
+            coll[i] = _users[_index[i + offset]];
         }
 
-        return collection;
+        return coll;
     }
 }
