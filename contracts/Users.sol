@@ -24,6 +24,7 @@ contract Users {
     mapping(address => User) private _users;
     address[] private _index;
     mapping(address => address[]) private _sponsors;
+    uint256 public constant maxLimit = 50;
 
     event UserAdded(
         address indexed user,
@@ -41,7 +42,7 @@ contract Users {
             1650123201,
             UserType.MENTOR
         );
-        
+
         _index.push(msg.sender);
     }
 
@@ -92,5 +93,23 @@ contract Users {
 
     function sponsorCount(address sponsor) public view returns (uint256) {
         return _sponsors[sponsor].length;
+    }
+
+    function users(uint256 limit, uint256 offset)
+        public
+        view
+        returns (User[] memory collection)
+    {
+        require(offset <= _index.length, "offset out of bounds");
+        uint256 size = _index.length - offset;
+        size = size < limit ? size : limit;
+        size = size < maxLimit ? size : maxLimit;
+
+        collection = new User[](size);
+        for (uint256 i = 0; i < size; i++) {
+            collection[i] = _users[_index[i]];
+        }
+
+        return collection;
     }
 }
