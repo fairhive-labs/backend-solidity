@@ -57,10 +57,12 @@ contract("Users", (accounts) => {
         assert(web3.utils.toBN(sponsorCount).isZero(), `sponsor count of ${accounts[2]} should be equal to 0 because ${accounts[2]} is not a sponsor`);
     });
 
-    it("should list users", async () => {
+    it("should list users with offsets / limits", async () => {
         const contract = await Users.deployed();
-        // add multiple users 
+        // add multiple users
+        const ids = [];
         for (let i = 0; i < 7; i++) {
+            ids.push(`uuid-${2 + i}`);
             await contract.add(sponsor, `h4sh3mail-${2 + i}`, `uuid-${2 + i}`, i % 7, { from: accounts[2 + i] });
         }
         const count = web3.utils.toBN(await contract.count());
@@ -69,9 +71,49 @@ contract("Users", (accounts) => {
 
         let limit = 10;
         let offset = 0;
-        const users = await contract.users(offset,limit);
-        assert(users,"users should be defined");
+        let users = await contract.users(offset, limit);
+        assert(users, "users should be defined");
         assert(users.length == expectedCount, `users length should be ${expectedCount}`);
+
+        limit = 1000;
+        users = await contract.users(offset, limit);
+        assert(users, "users should be defined");
+        assert(users.length != limit, `users length should not be ${limit} but ${expectedCount}`);
+
+        limit = 5;
+        users = await contract.users(offset, limit);
+        assert(users, "users should be defined");
+        assert(users.length == limit, `users length should  be ${limit}`);
+
+        offset = 2;
+        users = await contract.users(offset, limit);
+        assert(users, "users should be defined");
+        assert(users.length == limit, `users length should  be ${limit}`);
+        for (let i = 0; i < users.length; i++) {
+            id = users[i].uuid;
+            assert(ids.findIndex(v => v == id) !== -1, `no user with uuid ${id} in users list`);
+        }
+
+        offset = expectedCount - limit + 1;
+        users = await contract.users(offset, limit);
+        assert(users, "users should be defined");
+        assert(users.length !== limit, `users length should not be ${limit}`);
+        assert(users.length == expectedCount - limit, `users length should be ${expectedCount - limit}`);
+        for (let i = 0; i < users.length; i++) {
+            id = users[i].uuid;
+            assert(ids.findIndex(v => v == id) !== -1, `no user with uuid ${id} in users list`);
+        }
+
+        offset = 1000;
+        try {
+            await contract.users(offset, limit);
+            assert(false, "should not get users list with offset=1000");
+        } catch (err) {
+            assert(err, "getting users list with offset=1000 should revert");
+            if (err.reason) {
+                assert(err.reason === "offset out of bounds");
+            }
+        }
     });
 
 });
