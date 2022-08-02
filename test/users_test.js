@@ -11,32 +11,32 @@ contract("Users", (accounts) => {
         console.log(`${contract.address}`);
     });
 
-    it("has expected initial count", async () => {
+    it("has expected initial total", async () => {
         const contract = await Users.deployed();
-        const count = web3.utils.toBN(await contract.count());
-        assert(count, "count is undefined");
-        assert(web3.utils.isBN(count), "count is not a Big Number");
-        assert(!count.isZero(), "count cannot be 0");
-        assert(web3.utils.toBN(1).eq(count), "count should be equal to 1");
+        const total = web3.utils.toBN(await contract.total());
+        assert(total, "total is undefined");
+        assert(web3.utils.isBN(total), "total is not a Big Number");
+        assert(!total.isZero(), "total cannot be 0");
+        assert(web3.utils.toBN(1).eq(total), "total should be equal to 1");
     });
 
     it("should add a user", async () => {
         const contract = await Users.deployed();
-        let count = web3.utils.toBN(await contract.count());
-        assert(count, "count is undefined");
-        assert(web3.utils.isBN(count), "count is not a Big Number");
-        assert(!count.isZero(), "count cannot be 0");
+        let total = web3.utils.toBN(await contract.total());
+        assert(total, "total is undefined");
+        assert(web3.utils.isBN(total), "total is not a Big Number");
+        assert(!total.isZero(), "total cannot be 0");
 
         time = 997358400 // Thursday, August 9, 2001 12:00:00 PM
         utype = 6; // talent
 
         const tx = await contract.add(sponsor, "h4sh3mail", "uuid-123456789", utype, { from: accounts[1] });
 
-        count = web3.utils.toBN(await contract.count());
-        assert(count, "count after adding user is undefined");
-        assert(web3.utils.isBN(count), "count after adding user is not a Big Number");
+        total = web3.utils.toBN(await contract.total());
+        assert(total, "total after adding user is undefined");
+        assert(web3.utils.isBN(total), "total after adding user is not a Big Number");
         const expectedCount = 2;
-        assert(web3.utils.toBN(expectedCount).eq(count), `count should be equal to ${expectedCount}`);
+        assert(web3.utils.toBN(expectedCount).eq(total), `total should be equal to ${expectedCount}`);
 
         const expectedEvent = "UserAdded";
         const actualEvent = tx.logs[0].event;
@@ -65,9 +65,9 @@ contract("Users", (accounts) => {
             ids.push(`uuid-${2 + i}`);
             await contract.add(sponsor, `h4sh3mail-${2 + i}`, `uuid-${2 + i}`, i % 7, { from: accounts[2 + i] });
         }
-        const count = web3.utils.toBN(await contract.count());
+        const total = web3.utils.toBN(await contract.total());
         const expectedCount = 9;
-        assert(web3.utils.toBN(expectedCount).eq(count), `count should be equal to ${expectedCount}`);
+        assert(web3.utils.toBN(expectedCount).eq(total), `total should be equal to ${expectedCount}`);
 
         let limit = 10;
         let offset = 0;
@@ -116,4 +116,9 @@ contract("Users", (accounts) => {
         }
     });
 
+    it("should poll users by type", async () => { 
+        const contract = await Users.deployed();
+        const poll = await contract.poll();
+        console.log(poll);
+    });
 });

@@ -21,6 +21,11 @@ struct User {
 }
 
 contract Users {
+    struct Count {
+        UserType utype;
+        uint256 count;
+    }
+
     mapping(address => User) private _users;
     address[] private _index;
     mapping(address => address[]) private _sponsors;
@@ -46,7 +51,7 @@ contract Users {
         _index.push(msg.sender);
     }
 
-    function count() public view returns (uint256) {
+    function total() public view returns (uint256) {
         return _index.length;
     }
 
@@ -111,5 +116,15 @@ contract Users {
         }
 
         return coll;
+    }
+
+    //@TODO: improve test
+    function poll() public view returns (uint256[] memory) {
+        uint256[] memory polling = new uint256[](7);
+        for (uint256 i = 0; i < _index.length; i++) {
+            uint256 t = uint256(_users[_index[i]].utype);
+            polling[t]++;
+        }
+        return polling;
     }
 }
