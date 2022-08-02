@@ -116,9 +116,28 @@ contract("Users", (accounts) => {
         }
     });
 
-    it("should poll users by type", async () => { 
+    it("should count users by type", async () => {
+        const userType = [
+            'advisor',
+            'agent',
+            'client',
+            'contributor',
+            'investor',
+            'mentor',
+            'talent'
+        ];
+        const expectedCount = [1, 1, 1, 1, 1, 2, 2];
+
         const contract = await Users.deployed();
-        const poll = await contract.poll();
-        console.log(poll);
+        assert(contract, "contract is not deployed");
+
+        const counting = await contract.countByType();
+        assert(expectedCount.length === counting.length, `counting length should be ${expectedCount.length}`);
+        for (let i = 0; i < counting.length; i++) {
+            assert(web3.utils.isBN(counting[i]), `count of ${userType[i]} should be a Big Number`);
+            assert(web3.utils.toBN(expectedCount[i]).eq(counting[i]), `count of ${userType[i]} should be a ${expectedCount[i]}`);
+        }
+
+
     });
 });

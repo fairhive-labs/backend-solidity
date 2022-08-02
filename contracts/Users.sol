@@ -118,13 +118,12 @@ contract Users {
         return coll;
     }
 
-    //@TODO: improve test
-    function poll() public view returns (uint256[] memory) {
-        uint256[] memory polling = new uint256[](7);
+    function countByType() public view returns (uint256[] memory) {
+        uint256[] memory counting = new uint256[](7);
         for (uint256 i = 0; i < _index.length; i++) {
-            uint256 t = uint256(_users[_index[i]].utype);
-            polling[t]++;
+            uint256 t = uint256(_users[_index[i]].utype); //cast enum into uint256
+            counting[t]++;
         }
-        return polling;
+        return counting;
     }
 }
