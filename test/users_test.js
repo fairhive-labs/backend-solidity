@@ -140,4 +140,11 @@ contract("Users", (accounts) => {
 
 
     });
+
+
+    it('should be able to increase the user limit using set Users() function only by owner', async() => {
+        const contract = await Users.deployed();
+        assert(await contract.setUsers(52), "users limit is decreased");
+    });
+
 });

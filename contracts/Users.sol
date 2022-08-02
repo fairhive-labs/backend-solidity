@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-
+import "@openzeppelin/contracts/access/Ownable.sol";
 enum UserType {
     ADVISOR,
     AGENT,
@@ -20,6 +20,9 @@ struct User {
     UserType utype;
 }
 
+error limitNotIncreased();
+
+
 contract Users {
     struct Count {
         UserType utype;
@@ -29,7 +32,7 @@ contract Users {
     mapping(address => User) private _users;
     address[] private _index;
     mapping(address => address[]) private _sponsors;
-    uint256 public constant maxLimit = 50;
+    uint256 public  maxLimit = 50;
 
     event UserAdded(
         address indexed user,
@@ -51,6 +54,7 @@ contract Users {
         _index.push(msg.sender);
     }
 
+    
     function total() public view returns (uint256) {
         return _index.length;
     }
@@ -100,7 +104,7 @@ contract Users {
         return _sponsors[sponsor].length;
     }
 
-    function users(uint256 offset, uint256 limit)
+    function addUsers(uint256 offset, uint256 limit)
         public
         view
         returns (User[] memory coll)
@@ -117,6 +121,17 @@ contract Users {
 
         return coll;
     }
+
+    function setUsers(uint newLimit) onlyOwner returns (bool) {
+        if(newLimit <=  maxLimit)
+        {
+            throw limitNotIncreased();
+        }
+        maxLimit = newLimit;
+        return true;
+    }
+
+
 
     function countByType() public view returns (uint256[] memory) {
         uint256[] memory counting = new uint256[](7);
