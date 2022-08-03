@@ -21,7 +21,7 @@ struct User {
 }
 
 
-contract Users {
+contract Users is Ownable{
     struct Count {
         UserType utype;
         uint256 count;
