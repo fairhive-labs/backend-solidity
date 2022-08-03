@@ -137,7 +137,29 @@ contract("Users", (accounts) => {
             assert(web3.utils.isBN(counting[i]), `count of ${userType[i]} should be a Big Number`);
             assert(web3.utils.toBN(expectedCount[i]).eq(counting[i]), `count of ${userType[i]} should be a ${expectedCount[i]}`);
         }
+    });
 
+    it("should update maxLimit", async () => {
+        const contract = await Users.deployed();
+        assert(contract, "contract is not deployed");
 
+        let maxLimit = await contract.maxLimit();
+        assert(web3.utils.isBN(maxLimit));
+        assert(web3.utils.toBN(50).eq(maxLimit));
+
+        // increase
+        const tx = await contract.setMaxLimit(100);
+        const expectedEvent = "MaxLimitUpdated";
+        const actualEvent = tx.logs[0].event;
+        assert(actualEvent, expectedEvent, "updating maxLimit events should match");
+        assert(web3.utils.isBN(tx.logs[0].args.newLimit));
+        assert(web3.utils.isBN(tx.logs[0].args.previousLimit));
+        assert(web3.utils.toBN(100).eq(tx.logs[0].args.newLimit)); 
+        assert(web3.utils.toBN(50).eq(tx.logs[0].args.previousLimit));
+        maxLimit = await contract.maxLimit();
+        assert(web3.utils.isBN(maxLimit));
+        assert(web3.utils.toBN(100).eq(maxLimit));
+
+        //@TODO : test decrease and onlyOwner modifier
     });
 });

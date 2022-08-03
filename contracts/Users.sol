@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+
 enum UserType {
     ADVISOR,
     AGENT,
@@ -20,22 +22,19 @@ struct User {
     UserType utype;
 }
 
-contract Users {
-    struct Count {
-        UserType utype;
-        uint256 count;
-    }
-
+contract Users is Ownable {
     mapping(address => User) private _users;
     address[] private _index;
     mapping(address => address[]) private _sponsors;
-    uint256 public constant maxLimit = 50;
+    uint256 public maxLimit = 50;
 
     event UserAdded(
         address indexed user,
         UserType indexed utype,
         uint256 timestamp
     );
+
+    event MaxLimitUpdated(uint256 newLimit, uint256 previousLimit);
 
     constructor() {
         //first user
@@ -125,5 +124,11 @@ contract Users {
             counting[t]++;
         }
         return counting;
+    }
+
+    function setMaxLimit(uint256 limit) public onlyOwner {
+        uint256 previousLimit = maxLimit;
+        maxLimit = limit;
+        emit MaxLimitUpdated(limit, previousLimit);
     }
 }
