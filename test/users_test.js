@@ -148,18 +148,39 @@ contract("Users", (accounts) => {
         assert(web3.utils.toBN(50).eq(maxLimit));
 
         // increase
-        const tx = await contract.setMaxLimit(100);
-        const expectedEvent = "MaxLimitUpdated";
-        const actualEvent = tx.logs[0].event;
+        let tx = await contract.setMaxLimit(100);
+        let expectedEvent = "MaxLimitUpdated";
+        let actualEvent = tx.logs[0].event;
         assert(actualEvent, expectedEvent, "updating maxLimit events should match");
         assert(web3.utils.isBN(tx.logs[0].args.newLimit));
         assert(web3.utils.isBN(tx.logs[0].args.previousLimit));
-        assert(web3.utils.toBN(100).eq(tx.logs[0].args.newLimit)); 
+        assert(web3.utils.toBN(100).eq(tx.logs[0].args.newLimit));
         assert(web3.utils.toBN(50).eq(tx.logs[0].args.previousLimit));
         maxLimit = await contract.maxLimit();
         assert(web3.utils.isBN(maxLimit));
         assert(web3.utils.toBN(100).eq(maxLimit));
 
-        //@TODO : test decrease and onlyOwner modifier
+        // decrease 
+        tx = await contract.setMaxLimit(10);
+        expectedEvent = "MaxLimitUpdated";
+        actualEvent = tx.logs[0].event;
+        assert(actualEvent, expectedEvent, "updating maxLimit events should match");
+        assert(web3.utils.isBN(tx.logs[0].args.newLimit));
+        assert(web3.utils.isBN(tx.logs[0].args.previousLimit));
+        assert(web3.utils.toBN(10).eq(tx.logs[0].args.newLimit));
+        assert(web3.utils.toBN(100).eq(tx.logs[0].args.previousLimit));
+        maxLimit = await contract.maxLimit();
+        assert(web3.utils.isBN(maxLimit));
+        assert(web3.utils.toBN(10).eq(maxLimit));
+
+        try {
+            await contract.setMaxLimit(50, { from: accounts[1] });
+            assert(false, "owner should be the only one allowed to update maxLimit variable");
+        } catch (err) {
+            assert(err, "unauthorized maxLimit updates should revert");
+            if (err.reason) {
+                assert(err.reason === "Ownable: caller is not the owner");
+            }
+        }
     });
 });
