@@ -20,8 +20,6 @@ struct User {
     UserType utype;
 }
 
-error limitNotIncreased();
-
 
 contract Users {
     struct Count {
@@ -123,10 +121,7 @@ contract Users {
     }
 
     function setUsers(uint newLimit) onlyOwner returns (bool) {
-        if(newLimit <=  maxLimit)
-        {
-            throw limitNotIncreased();
-        }
+        require(newLimit <=  maxLimit, "Users:limit-not-increased");
         maxLimit = newLimit;
         return true;
     }
