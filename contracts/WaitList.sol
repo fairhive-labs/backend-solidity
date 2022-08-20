@@ -2,26 +2,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./Users.sol";
+import "./POLNToken.sol";
+
 contract WaitList {
-   
-    uint256 public constant max = 10000;
+    uint256 public max;
+    uint256 public count = 0;
 
-    // function register(User memory user) public {
-    //     User memory _user = User(
-    //         msg.sender,
-    //         user.sponsor,
-    //         user.email,
-    //         user.uuid,
-    //         block.timestamp,
-    //         user.utype
-    //     );
+    Users private _users;
+    POLNToken private _poln;
 
-    //     //@TODO : control user does not exist
-    //     _preregisteredUsers[msg.sender] = _user;
-    //     _index[_count] = msg.sender;
-    //     _count++;
-    //     _sponsors[user.sponsor]++;
-
-    //     emit PreregisteredUserAdded(msg.sender, _user.utype, block.timestamp);
-    // }
+    constructor(
+        uint256 m,
+        address u,
+        address p
+    ) {
+        max = m;
+        _users = Users(u);
+        _poln = POLNToken(p);
+    }
 }
