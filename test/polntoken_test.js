@@ -52,7 +52,7 @@ contract("POLNToken", (accounts) => {
         assert(supply);
         const balance = web3.utils.toBN(await contract.balanceOf(accounts[0]));
         assert(balance);
-        assert(supply.eq(balance));
+        assert(supply.gte(balance));
     });
 
     it("should transfer", async () => {
@@ -63,7 +63,7 @@ contract("POLNToken", (accounts) => {
         assert(account1b1);
 
         assert(!account0b1.isZero());
-        assert(account0b1.eq(totalSupply));
+        assert(totalSupply.gte(account0b1));
         assert(account1b1.isZero());
 
         const amount = web3.utils.toBN(1000);
