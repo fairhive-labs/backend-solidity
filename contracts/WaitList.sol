@@ -13,12 +13,12 @@ contract WaitList {
     POLNToken private _poln;
 
     constructor(
-        uint256 m,
+        address p,
         address u,
-        address p
+        uint256 m
     ) {
-        max = m;
-        _users = Users(u);
         _poln = POLNToken(p);
+        _users = Users(u);
+        max = m;
     }
 }
