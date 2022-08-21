@@ -6,19 +6,22 @@ import "./Users.sol";
 import "./POLNToken.sol";
 
 contract WaitList {
-    uint256 public max;
     uint256 public count = 0;
-
+    uint256 public max;
+    uint256 public prize;
+    
     Users private _users;
     POLNToken private _poln;
 
     constructor(
-        address p,
-        address u,
-        uint256 m
+        address poln,
+        address users,
+        uint256 m,
+        uint256 p
     ) {
-        _poln = POLNToken(p);
-        _users = Users(u);
+        _poln = POLNToken(poln);
+        _users = Users(users);
         max = m;
+        prize = p;
     }
 }
