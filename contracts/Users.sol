@@ -68,7 +68,7 @@ contract Users is Ownable {
         UserType utype
     ) public {
         require(exist(sponsor), "Sponsor's address required");
-        require(!exist(msg.sender), "Can't add an already used address");
+        require(!exist(tx.origin), "Can't add an already used address");
         require(
             bytes(email).length != 0,
             "Valid encrypted email address required"
@@ -76,7 +76,7 @@ contract Users is Ownable {
         require(bytes(uuid).length != 0, "Valid UUID required");
 
         User memory _user = User(
-            msg.sender,
+            tx.origin,
             sponsor,
             email,
             uuid,
@@ -84,11 +84,11 @@ contract Users is Ownable {
             utype
         );
 
-        _users[msg.sender] = _user;
-        _index.push(msg.sender);
-        _sponsors[sponsor].push(msg.sender);
+        _users[tx.origin] = _user;
+        _index.push(tx.origin);
+        _sponsors[sponsor].push(tx.origin);
 
-        emit UserAdded(msg.sender, _user.utype, block.timestamp);
+        emit UserAdded(tx.origin, _user.utype, block.timestamp);
     }
 
     function isSponsor(address sponsor) public view returns (bool) {
