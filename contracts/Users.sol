@@ -54,7 +54,7 @@ contract Users is Ownable {
         return _index.length;
     }
 
-    function exist(address user) private view returns (bool) {
+    function contains(address user) private view returns (bool) {
         return
             _users[user].sponsor != address(0) &&
             bytes(_users[user].uuid).length != 0 &&
@@ -67,8 +67,8 @@ contract Users is Ownable {
         string memory uuid,
         UserType utype
     ) public {
-        require(exist(sponsor), "Sponsor's address required");
-        require(!exist(tx.origin), "Can't add an already used address");
+        require(contains(sponsor), "Valid sponsor address required");
+        require(!contains(tx.origin), "Address already added");
         require(
             bytes(email).length != 0,
             "Valid encrypted email address required"
