@@ -56,14 +56,17 @@ contract Users is Ownable {
 
     function contains(address user) private view returns (bool) {
         return
+            _users[user].user != address(0) &&
             _users[user].sponsor != address(0) &&
+            bytes(_users[user].email).length != 0 &&
             bytes(_users[user].uuid).length != 0 &&
-            _users[user].timestamp > 0;
+            _users[user].timestamp > 0; // utype not tested, should not require a specific value for undefined utype.
     }
 
-    // function get(address user) external view returns (User memory) {
-    //     return _users[user];
-    // }
+    function get(address user) external view returns (User memory) {
+        require(contains(user), "user not found");
+        return _users[user];
+    }
 
     function add(
         address sponsor,
@@ -71,13 +74,13 @@ contract Users is Ownable {
         string memory uuid,
         UserType utype
     ) external {
-        require(contains(sponsor), "Valid sponsor address required");
-        require(!contains(tx.origin), "Address already added");
+        require(contains(sponsor), "valid sponsor address required");
+        require(!contains(tx.origin), "address already added");
         require(
             bytes(email).length != 0,
-            "Valid encrypted email address required"
+            "valid encrypted email address required"
         );
-        require(bytes(uuid).length != 0, "Valid UUID required");
+        require(bytes(uuid).length != 0, "valid UUID required");
 
         User memory _user = User(
             tx.origin,
