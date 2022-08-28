@@ -50,7 +50,7 @@ contract Users is Ownable {
         _index.push(msg.sender);
     }
 
-    function total() public view returns (uint256) {
+    function total() external view returns (uint256) {
         return _index.length;
     }
 
@@ -61,12 +61,16 @@ contract Users is Ownable {
             _users[user].timestamp > 0;
     }
 
+    // function get(address user) external view returns (User memory) {
+    //     return _users[user];
+    // }
+
     function add(
         address sponsor,
         string memory email,
         string memory uuid,
         UserType utype
-    ) public {
+    ) external {
         require(contains(sponsor), "Valid sponsor address required");
         require(!contains(tx.origin), "Address already added");
         require(
@@ -91,7 +95,7 @@ contract Users is Ownable {
         emit UserAdded(tx.origin, _user.utype, block.timestamp);
     }
 
-    function isSponsor(address sponsor) public view returns (bool) {
+    function isSponsor(address sponsor) external view returns (bool) {
         return sponsorCount(sponsor) != 0;
     }
 
@@ -100,7 +104,7 @@ contract Users is Ownable {
     }
 
     function users(uint256 offset, uint256 limit)
-        public
+        external
         view
         returns (User[] memory coll)
     {
@@ -117,7 +121,7 @@ contract Users is Ownable {
         return coll;
     }
 
-    function countByType() public view returns (uint256[] memory) {
+    function countByType() external view returns (uint256[] memory) {
         uint256[] memory counting = new uint256[](7);
         for (uint256 i = 0; i < _index.length; i++) {
             uint256 t = uint256(_users[_index[i]].utype); //cast enum into uint256
@@ -126,7 +130,7 @@ contract Users is Ownable {
         return counting;
     }
 
-    function setMaxLimit(uint256 limit) public onlyOwner {
+    function setMaxLimit(uint256 limit) external onlyOwner {
         uint256 previousLimit = maxLimit;
         maxLimit = limit;
         emit MaxLimitUpdated(limit, previousLimit);
