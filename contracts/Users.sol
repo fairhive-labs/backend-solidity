@@ -6,11 +6,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 enum UserType {
     ADVISOR,
     AGENT,
-    CLIENT,
+    INITIATOR,
     CONTRIBUTOR,
     INVESTOR,
     MENTOR,
-    TALENT
+    CONTRACTOR
 }
 
 struct User {
@@ -50,15 +50,22 @@ contract Users is Ownable {
         _index.push(msg.sender);
     }
 
-    function total() public view returns (uint256) {
+    function total() external view returns (uint256) {
         return _index.length;
     }
 
-    function exist(address user) private view returns (bool) {
+    function contains(address user) private view returns (bool) {
         return
+            _users[user].user != address(0) &&
             _users[user].sponsor != address(0) &&
+            bytes(_users[user].email).length != 0 &&
             bytes(_users[user].uuid).length != 0 &&
-            _users[user].timestamp > 0;
+            _users[user].timestamp > 0; // utype not tested, should not require a specific value for undefined utype.
+    }
+
+    function get(address user) external view returns (User memory) {
+        require(contains(user), "user not found");
+        return _users[user];
     }
 
     function add(
@@ -66,17 +73,17 @@ contract Users is Ownable {
         string memory email,
         string memory uuid,
         UserType utype
-    ) public {
-        require(exist(sponsor), "Sponsor's address required");
-        require(!exist(msg.sender), "Can't add an already used address");
+    ) external {
+        require(contains(sponsor), "valid sponsor address required");
+        require(!contains(tx.origin), "address already added");
         require(
             bytes(email).length != 0,
-            "Valid encrypted email address required"
+            "valid encrypted email address required"
         );
-        require(bytes(uuid).length != 0, "Valid UUID required");
+        require(bytes(uuid).length != 0, "valid UUID required");
 
         User memory _user = User(
-            msg.sender,
+            tx.origin,
             sponsor,
             email,
             uuid,
@@ -84,14 +91,14 @@ contract Users is Ownable {
             utype
         );
 
-        _users[msg.sender] = _user;
-        _index.push(msg.sender);
-        _sponsors[sponsor].push(msg.sender);
+        _users[tx.origin] = _user;
+        _index.push(tx.origin);
+        _sponsors[sponsor].push(tx.origin);
 
-        emit UserAdded(msg.sender, _user.utype, block.timestamp);
+        emit UserAdded(tx.origin, _user.utype, block.timestamp);
     }
 
-    function isSponsor(address sponsor) public view returns (bool) {
+    function isSponsor(address sponsor) external view returns (bool) {
         return sponsorCount(sponsor) != 0;
     }
 
@@ -100,7 +107,7 @@ contract Users is Ownable {
     }
 
     function users(uint256 offset, uint256 limit)
-        public
+        external
         view
         returns (User[] memory coll)
     {
@@ -117,7 +124,7 @@ contract Users is Ownable {
         return coll;
     }
 
-    function countByType() public view returns (uint256[] memory) {
+    function countByType() external view returns (uint256[] memory) {
         uint256[] memory counting = new uint256[](7);
         for (uint256 i = 0; i < _index.length; i++) {
             uint256 t = uint256(_users[_index[i]].utype); //cast enum into uint256
@@ -126,7 +133,7 @@ contract Users is Ownable {
         return counting;
     }
 
-    function setMaxLimit(uint256 limit) public onlyOwner {
+    function setMaxLimit(uint256 limit) external onlyOwner {
         uint256 previousLimit = maxLimit;
         maxLimit = limit;
         emit MaxLimitUpdated(limit, previousLimit);

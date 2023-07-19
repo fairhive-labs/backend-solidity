@@ -20,6 +20,31 @@ contract("Users", (accounts) => {
         assert(web3.utils.toBN(1).eq(total), "total should be equal to 1");
     });
 
+    it("should get a user", async () => {
+        const contract = await Users.deployed();
+        const [a0, a1] = [accounts[0], accounts[1]];
+
+        //test first user
+        const u0 = await contract.get(a0);
+        assert(a0 === u0.user);
+        assert(a0 === u0.sponsor); // first user is its own sponsor
+        assert(u0.email === "9a3ca5351679ea72cb2554284e4f11b7a29bf312ef63abdee4ca99635a056fad3db5f0eac25402b49eb620ecaf41326a1685");
+        assert(u0.uuid === "f9a5fb84-cdd2-46ed-aa27-44426f5e99c6");
+        assert(u0.timestamp == 1650123201);
+        assert(u0.utype == 5); // mentor
+
+        try {
+            const u1 = await contract.get(a1);
+            assert(false, `should not get user ${a1}`);
+        } catch (err) {
+            assert(err, `error getting user ${a1} is expected`);
+            if (err.reason) {
+                assert(err.reason === "user not found");
+            }
+        }
+
+    });
+
     it("should add a user", async () => {
         const contract = await Users.deployed();
         let total = web3.utils.toBN(await contract.total());
@@ -28,7 +53,7 @@ contract("Users", (accounts) => {
         assert(!total.isZero(), "total cannot be 0");
 
         time = 997358400 // Thursday, August 9, 2001 12:00:00 PM
-        utype = 6; // talent
+        utype = 6; // contractor
 
         const tx = await contract.add(sponsor, "h4sh3mail", "uuid-123456789", utype, { from: accounts[1] });
 
@@ -120,11 +145,11 @@ contract("Users", (accounts) => {
         const userType = [
             'advisor',
             'agent',
-            'client',
+            'initiator',
             'contributor',
             'investor',
             'mentor',
-            'talent'
+            'contractor'
         ];
         const expectedCount = [1, 1, 1, 1, 1, 2, 2];
 
