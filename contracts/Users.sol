@@ -6,11 +6,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 enum UserType {
     ADVISOR,
     AGENT,
-    CLIENT,
+    INITIATOR,
     CONTRIBUTOR,
     INVESTOR,
     MENTOR,
-    TALENT
+    CONTRACTOR
 }
 
 struct User {

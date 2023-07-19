@@ -53,7 +53,7 @@ contract("Users", (accounts) => {
         assert(!total.isZero(), "total cannot be 0");
 
         time = 997358400 // Thursday, August 9, 2001 12:00:00 PM
-        utype = 6; // talent
+        utype = 6; // contractor
 
         const tx = await contract.add(sponsor, "h4sh3mail", "uuid-123456789", utype, { from: accounts[1] });
 
@@ -145,11 +145,11 @@ contract("Users", (accounts) => {
         const userType = [
             'advisor',
             'agent',
-            'client',
+            'initiator',
             'contributor',
             'investor',
             'mentor',
-            'talent'
+            'contractor'
         ];
         const expectedCount = [1, 1, 1, 1, 1, 2, 2];
 
